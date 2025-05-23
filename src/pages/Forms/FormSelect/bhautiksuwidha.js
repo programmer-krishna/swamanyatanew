@@ -1,5 +1,9 @@
+// Bhautik suvidha 
+
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardBody, Col, Label,Input, Row } from 'reactstrap';
+import Swal from 'sweetalert2';
 import BreadCrumb from '../../../Components/Common/BreadCrumb';
 import PreviewCardHeader from '../../../Components/Common/PreviewCardHeader';
 import UiContent from "../../../Components/Common/UiContent";
@@ -11,7 +15,11 @@ import { Link, useNavigate ,useLocation } from 'react-router-dom';
 import { FaChevronRight } from 'react-icons/fa';
 
 
-
+const SingleOptions = [
+    { value: 'Yes', label: 'होय' },
+    { value: 'No', label: 'नाही' },
+   
+];
 
 const SingleOptions1 = [
     { value: 'Yes', label: 'होय' },
@@ -20,24 +28,20 @@ const SingleOptions1 = [
 
 
 // Rooms for which data is entered
-const roomLabels = [
-    "मुख्याध्यापक",
-    "कार्यालय",
-    "स्टाफरुम",
-    "भांडारखोली",
-    "वर्गखोल्यांची संख्या",
-    "विज्ञान प्रयोगशाळा",
-    "१० संगणकांचा कक्ष",
-    "ग्रंथालय"
-];
+// Maps Marathi labels to corresponding field names in `otherFacilityFormData`
+const roomFieldMap = {
+    "मुख्याध्यापक": { count: "principalCount", area: "principalArea" },
+    "कार्यालय": { count: "officeCount", area: "officeArea" },
+    "स्टाफरुम": { count: "staffCount", area: "staffArea" },
+    "भांडारखोली": { count: "storageCount", area: "storageArea" },
+    "वर्गखोल्यांची संख्या": { count: "classroomCount", area: "classroomArea" },
+    "विज्ञान प्रयोगशाळा": { count: "labCount", area: "labArea" },
+    "१० संगणकांचा कक्ष": { count: "compCount", area: "compArea" },
+    "ग्रंथालय": { count: "libraryCount", area: "libraryArea" }
+};
 
- 
+const roomLabels = Object.keys(roomFieldMap);
 
-const SingleOptions = [
-    { value: 'Yes', label: 'होय' },
-    { value: 'No', label: 'नाही' },
-   
-];
 
 
 const SingleOptionsT = Array.from({ length: 100 }, (_, i) => {
@@ -97,31 +101,127 @@ const SingleOptions2 = [
 const FormSelect1 = () => {
 
 
+    const [schoolId, setSchoolId] = useState(1);
+    const [applicationId, setApplicationId] = useState(1);
 
-        
+    const [otherFacilityFormData, setOtherFacilityFormData] = useState({
+    createdAt: "",
+    updatedAt: "",
 
-      const [fireWarrantyCylinderNo, setFireWarrantyCylinderNo] = useState("");
-      const [medicalPrimaryBoxNumber, setMedicalPrimaryBoxNumber] = useState("");
-      const [cctvNo, setCctvNo] = useState("");
-      const [areaOfPlayground, setAreaOfPlayground] = useState("");
-      const [totalAreaSqM, setTotalAreaSqM] = useState("");
-      const [waterTankCapacity, setWaterTankCapacity] = useState('');
-      const[schoolTotalAreaSqM, setschoolTotalAreaSqM]=useState("");
-      const[kitchenShed, setkitchenShed]=useState("");
-      const[room_number, setroom_number]=useState("");
-      const[retainingWallCompound, setretainingWallCompound]=useState("");
-      const [typeOfProofAvailableAndItsDate, setTypeOfProofAvailableAndItsDate] = useState("");
-      const[areaSqM, setareaSqM]=useState("");
+    // General Info
+    whetherSchoolIsMovedToAnotherLocation: "",
+    typeOfProofAvailableAndItsDate: "",
+    forYouTakePropertyDocumentType: "",
+    areaSqM: "",
+    totalAreaSqM: "",
+    schoolTotalAreaSqM: "",
+
+    // Room Info
+    principalCount: "",
+    principalArea: "",
+    officeCount: "",
+    officeArea: "",
+    staffCount: "",
+    staffArea: "",
+    storageCount: "",
+    storageArea: "",
+    classroomCount: "",
+    classroomArea: "",
+    labCount: "",
+    labArea: "",
+    compCount: "",
+    compArea: "",
+    libraryCount: "",
+    libraryArea: "",
+    schoolTotalCount: "",
+    schoolTotalArea: "",
+
+    // Toilets and Drinking Water
+    westernToiletCount: "",
+    seperateBoysToiletCount: "",
+    seperateBoysToiletFacilityDetails: "",
+    seperateBoysWashroomCount: "",
+    seperateBoysWashroomFacilityDetails: "",
+    seperateBoysDrinkingWaterCount: "",
+    seperateBoysDrinkingWaterFacilityDetails: "",
+    seperateGirlsToiletCount: "",
+    seperateGirlsToiletFacilityDetails: "",
+    seperateGirlsWashroomCount: "",
+    seperateGirlsWashroomFacilityDetails: "",
+    seperateGirlsDrinkingWaterCount: "",
+    seperateGirlsDrinkingWaterFacilityDetails: "",
+
+    // Water Facilities
+    drinkingWaterFacility: "",
+    waterTankCapacity: "",
+    waterTapCount: "",
+    actualAvailableFacilityDetailsWater: "",
+    actualAvailableFacilityDetailsTap: "",
+
+    // Playground & Kitchen
+    areaOfPlayground: "",
+    areaOfPlaygroundDetails: "",
+    kitchen: "",
+    kitchenShed: "",
+    kitchenShedDetails: "",
+
+    // Ramp & Entrance
+    rampRoad: "",
+    rocksOnTheSideOfTheRamp: "",
+    rampFacilityDetails: "",
+    aRampForBarrierFreeAccess: "",
+    entranceWithProtectiveWallAndIronGate: "",
+    retainingWallCompound: "",
+
+    // Infrastructure
+    roomNumber: "",
+    theRoofIsSolidRcc: "",
+    fireWarrantyCylinderNo: "",
+    medicalPrimaryBoxNumber: "",
+    cctvNo: "",
+    plaquesInFacadesOfSchoolRecognition: "",
+
+    // Inspection Approvals
+    section1InspectionApproval: "",
+    section2InspectionApproval: "",
+    section3InspectionApproval: "",
+    section4InspectionApproval: "",
+    section5InspectionApproval: "",
+    section6InspectionApproval: "",
+
+    // Inspection Comments
+    section1InspectionComment: "",
+    section2InspectionComment: "",
+    section3InspectionComment: "",
+    section4InspectionComment: "",
+    section5InspectionComment: "",
+    section6InspectionComment: ""
+    });
 
 
-     const navigate = useNavigate();
-
-      
+    const navigate = useNavigate();
 
     const[successMsg,setSuccessMsg]=useState(null);
     const[errorMsg,setErrorMsg]=useState(null);
     const location = useLocation();
 
+
+// temporary data 
+const [fireWarrantyCylinderNo, setFireWarrantyCylinderNo] = useState("");
+const [medicalPrimaryBoxNumber, setMedicalPrimaryBoxNumber] = useState("");
+const [cctvNo, setCctvNo] = useState("");
+const [areaOfPlayground, setAreaOfPlayground] = useState("");
+const [totalAreaSqM, setTotalAreaSqM] = useState("");
+const [waterTankCapacity, setWaterTankCapacity] = useState('');
+const [schoolTotalAreaSqM, setschoolTotalAreaSqM] = useState("");
+const [kitchenShed, setkitchenShed] = useState("");
+const [room_number, setroom_number] = useState("");
+const [retainingWallCompound, setretainingWallCompound] = useState("");
+//const [typeOfProofAvailableAndItsDate, setTypeOfProofAvailableAndItsDate] = useState("");
+const [areaSqM, setareaSqM] = useState("");
+
+
+//temperary data end    
 
 
     const [selectedSingle, setSelectedSingle] = useState(null);
@@ -155,178 +255,112 @@ const FormSelect1 = () => {
     const [selectedSingle28, setSelectedSingle28] = useState(null);
 
 
+    // room related functionality
+    const roomData = roomLabels.reduce((acc, label) => {
+        const fields = roomFieldMap[label];
+        acc[label] = {
+            count: otherFacilityFormData[fields.count] || "",
+            area: otherFacilityFormData[fields.area] || ""
+        };
+        return acc;
+    }, {});
 
-    // State to track room data
-    const [roomData, setRoomData] = useState(
-        roomLabels.reduce((acc, label) => {
-            acc[label] = { count: "", area: "" };
-            return acc;
-        }, {})
-    );
 
-   const [totalArea, setTotalArea] = useState(""); 
-const [totalCount, setTotalCount] = useState("");
-
-    useEffect(() => {
-        let countSum = 0;
-        let areaSum = 0;
-
-        Object.values(roomData).forEach(({ count, area }) => {
-            countSum += parseFloat(count) || 0;
-            areaSum += parseFloat(area) || 0;
-        });
-
-        setTotalCount(countSum);
-        setTotalArea(areaSum);
-    }, [roomData]);
-
-    const handleRoomChange = (label, field, value) => {
-        setRoomData(prev => ({
+    const handleRoomChange = (label, type, value) => {
+    const fieldKey = roomFieldMap[label]?.[type];
+    if (fieldKey) {
+        setOtherFacilityFormData(prev => ({
             ...prev,
-            [label]: {
-                ...prev[label],
-                [field]: value
-            }
+            [fieldKey]: value
         }));
-    };
+    }
+};
+
+
+const totalCount = roomLabels.reduce((sum, label) => {
+    const count = parseInt(otherFacilityFormData[roomFieldMap[label].count]) || 0;
+    return sum + count;
+}, 0);
+
+const totalArea = roomLabels.reduce((sum, label) => {
+    const area = parseFloat(otherFacilityFormData[roomFieldMap[label].area]) || 0;
+    return sum + area;
+}, 0);
+
+
+
+
+    // useEffect(() => {
+    //     let countSum = 0;
+    //     let areaSum = 0;
+
+    //     Object.values(roomData).forEach(({ count, area }) => {
+    //         countSum += parseFloat(count) || 0;
+    //         areaSum += parseFloat(area) || 0;
+    //     });
+
+    //     setTotalCount(countSum);
+    //     setTotalArea(areaSum);
+    // }, [roomData]);
+
+
+    // centralized function to handle changes in other facility form data
+    const handleOtherFacilityChange = (field, value) => {
+        setOtherFacilityFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+     };
+
 
     const handleSubmit = async () => {
+    // Update state before sending the payload
     const payload = {
-        schoolId: 1, // Replace with dynamic va lue as required
-        applicationId:1 ,
+        schoolId,
+        applicationId,
+        ...otherFacilityFormData,
+
+        // Add any calculated or derived fields here
         forYouTakePropertyDocumentType: selectedSingle1?.value || "",
-        schoolTotalCount: totalCount.toString(),    
-        schoolTotalArea:totalArea.toString(),
+        schoolTotalCount: totalCount.toString(),
+        schoolTotalArea: totalArea.toString(),
 
-        typeOfProofAvailableAndItsDate: typeOfProofAvailableAndItsDate||  "",
+        // Add selectedSingle28 and selectedSingle3 values to the payload
+        westernToiletCount: selectedSingle28?.value || "",  // You need to make sure this value is set properly
+        specialNeedFacility: selectedSingle3?.value || "",  // Add this as well, if it's part of the form
 
-        // Boys facilities
-        seperateBoysToiletCount: selectedSingle4?.value || "",
-        seperateBoysToiletFacilityDetails: selectedSingle5?.value || "",
-        seperateBoysWashroomCount: selectedSingle6?.value || "",
-        seperateBoysWashroomFacilityDetails: selectedSingle7?.value || "",
-        seperateBoysDrinkingWaterCount: selectedSingle8?.value || "",
-        seperateBoysDrinkingWaterFacilityDetails: selectedSingle9?.value || "",
-
-        // Girls facilities
-        seperateGirlsToiletCount: selectedSingle27?.value || "",
-        seperateGirlsToiletFacilityDetails: selectedSingle10?.value || "",
-        seperateGirlsWashroomCount: selectedSingle11?.value || "",
-        seperateGirlsWashroomFacilityDetails: selectedSingle12?.value || "",
-        seperateGirlsDrinkingWaterCount: selectedSingle13?.value || "",
-        seperateGirlsDrinkingWaterFacilityDetails: selectedSingle14?.value || "",
-
-        // Drinking water & tank
-        waterTankCapacity: selectedSingle15?.value || "",
-        actualAvailableFacilityDetailsWater: selectedSingle16?.value || "",
-        waterTapCount: selectedSingle17?.value || "",
-        actualAvailableFacilityDetailsTap: selectedSingle18?.value || "",
-
-        // Playground
-          areaOfPlayground: areaOfPlayground || "",
-        areaOfPlaygroundDetails: selectedSingle19?.value || "",
-
-         areaSqM:areaSqM||"",   
-
-        // Boundary wall + iron gate
-        schoolTotalAreaSqM: schoolTotalAreaSqM || "", // Fill if dynamic            
-
-        entranceWithProtectiveWallAndIronGate: selectedSingle20?.value || "",
-
-        totalAreaSqM: totalAreaSqM || "",
-
-        retainingWallCompound: retainingWallCompound||" ",
-
-
-        // Kitchen shed
-        kitchenShed: kitchenShed||"", // Add value if applicable
-        kitchenShedDetails: selectedSingle21?.value || "",
-
-        // Ramp info
-        rampRoad: selectedSingle22?.value || "",
-        rocksOnTheSideOfTheRamp: selectedSingle23?.value || "",
-        rampFacilityDetails: selectedSingle24?.value || "",
-
-        // Classrooms info
-        classroomCount: roomData["वर्गखोल्यांची संख्या"]?.count || "",
-        classroomArea: roomData["वर्गखोल्यांची संख्या"]?.area || "",
-        roomNumber: room_number, // <-- use the expected backend key here
-        theRoofIsSolidRcc: selectedSingle25?.value || "",
-
-        // Other facilities
-        fireWarrantyCylinderNo, // Replace with actual field
-        medicalPrimaryBoxNumber, // Replace with actual field
-        cctvNo, // Replace with actual field
-        plaquesInFacadesOfSchoolRecognition: selectedSingle26?.value || "",
-         
-    
-
-
-        westernToiletCount: selectedSingle28?.value || "",
-
-
-        // Room mappings
-        principalCount: roomData["मुख्याध्यापक"]?.count || "",
-        principalArea: roomData["मुख्याध्यापक"]?.area || "",
-        officeCount: roomData["कार्यालय"]?.count || "",
-        officeArea: roomData["कार्यालय"]?.area || "",
-        staffCount: roomData["स्टाफरुम"]?.count || "",
-        staffArea: roomData["स्टाफरुम"]?.area || "",
-        storageCount: roomData["भांडारखोली"]?.count || "",
-        storageArea: roomData["भांडारखोली"]?.area || "",
-        labCount: roomData["विज्ञान प्रयोगशाळा"]?.count || "",
-        labArea: roomData["विज्ञान प्रयोगशाळा"]?.area || "",
-        compCount: roomData["१० संगणकांचा कक्ष"]?.count || "",
-        compArea: roomData["१० संगणकांचा कक्ष"]?.area || "",
-        libraryCount: roomData["ग्रंथालय"]?.count || "",
-        libraryArea: roomData["ग्रंथालय"]?.area || "",
-
-        // Required by DTO
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
 
-    //
+    console.log("Payload to send:", payload); // <-- Check this in the browser console
+
     try {
-            const response = await fetch("http://localhost:8080/api/bhautic-suvidha/create", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-    console.log(response);
-       if (response.ok) {
-        const data = await response.json();
-       if (data.status === "success") {
-        Swal.fire("यशस्वी", "माहिती जतन झाली आहे!", "success").then(() => {
-            navigate('/forms-select', { state: { tab: 'otherFacilities' } });
+        const response = await fetch("http://localhost:8080/api/bhautic-suvidha/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
         });
-    } else {
-        setErrorMsg(data.message || "जतन करण्यात अडचण आली!");
-    }
-    
-    } else {
-        setErrorMsg("सर्व्हर एरर: " + response.statusText);
-    }
-    
-    
-        } catch (error) {
-            console.error("Error while saving data:", error);
-           setErrorMsg("invalid data");
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status === "success") {
+                Swal.fire("यशस्वी", "माहिती जतन झाली आहे!", "success").then(() => {
+                    navigate('/forms-select', { state: { tab: 'otherFacilities' } });
+                });
+            } else {
+                setErrorMsg(data.message || "जतन करण्यात अडचण आली!");
+            }
+        } else {
+            setErrorMsg("सर्व्हर एरर: " + response.statusText);
         }
-
-
-
-
-//     try {
-//         const response = await axios.post("http://localhost:8080/api/bhautic-suvidha/create", payload);
-//         console.log("Submitted Successfully:", response.data);
-//         alert("डेटा यशस्वीरित्या जतन केला गेला आहे.");
-// navigate('/forms-select', { state: { tab: 'suwidha' } });
-//     } catch (error) {
-//         console.error("API Error:", error);
-//         alert("डेटा जतन करताना त्रुटी आली.");
-//     }
+    } catch (error) {
+        console.error("Error while saving data:", error);
+        setErrorMsg("Invalid data");
+    }
 };
+
+
     document.title = "भौतिक सुविधा";
 
     const [activeTab, setActiveTab] = useState(() => {
@@ -420,112 +454,111 @@ const [totalCount, setTotalCount] = useState("");
                                             </Label>
 
                                             <Select
-                                                value={SingleOptions.find(option => option.value === typeOfProofAvailableAndItsDate)}
-                                               onChange={(selectedOption) => {
-                                              setSelectedSingle(selectedOption); // still controls the UI
-                                              setTypeOfProofAvailableAndItsDate(selectedOption?.value || "");}}
-
+                                                value={SingleOptions.find(
+                                                option => option.value === otherFacilityFormData.typeOfProofAvailableAndItsDate
+                                                )}
+                                                onChange={selectedOption => {
+                                                setSelectedSingle(selectedOption); // UI control (optional, used if needed elsewhere)
+                                                handleOtherFacilityChange("typeOfProofAvailableAndItsDate", selectedOption?.value || "");
+                                                }}
                                                 options={SingleOptions}
                                                 placeholder="पर्याय निवडा"
                                                 menuPortalTarget={document.body}
                                                 styles={{
-                                                    menuPortal: base => ({ ...base, zIndex: 9999 }),
-                                                    control: base => ({
-                                                    ...base,
-                                                   
-                                                    }),
+                                                menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                                control: base => ({ ...base })
                                                 }}
-                                                />
-
+                                            />
                                         </Col>
 
 
                                             {/* Conditionally show second select if 'Yes' is selected */}
                                             {selectedSingle?.value === 'Yes' && (
-                                                <Col lg={6}>
-                                                    <div className="mb-0">
-                                                        <Label className="form-label">
-                                                            मालमत्ता दस्तऐवज प्रकार <span style={{ color: 'red' }}>*</span>
-                                                        </Label>
-                                                        <Select
-                                                            value={selectedSingle1}
-                                                            onChange={setSelectedSingle1}
-                                                            options={SingleOptions2}
-                                                            styles={{
-                                                                menuPortal: base => ({ ...base, zIndex: 9999 }),
-                                                                control: base => ({
-                                                                ...base,
-                                                                paddingTop: '9px',
-                                                                paddingBottom: '9px',
-                                                                }),
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </Col>
+                                            <Col lg={6}>
+                                                <div className="mb-0">
+                                                <Label className="form-label">
+                                                    मालमत्ता दस्तऐवज प्रकार <span style={{ color: 'red' }}>*</span>
+                                                </Label>
+                                                <Select
+                                                    value={SingleOptions2.find(
+                                                    option => option.value === otherFacilityFormData.forYouTakePropertyDocumentType
+                                                    )}
+                                                    onChange={selectedOption => {
+                                                    setSelectedSingle1(selectedOption); // for UI control
+                                                    handleOtherFacilityChange("forYouTakePropertyDocumentType", selectedOption?.value || "");
+                                                    }}
+                                                    options={SingleOptions2}
+                                                    styles={{
+                                                    menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                                    control: base => ({
+                                                        ...base,
+                                                        paddingTop: '9px',
+                                                        paddingBottom: '9px',
+                                                    }),
+                                                    }}
+                                                />
+                                                </div>
+                                            </Col>
                                             )}
                                         </Row>
                                     </div>
                                     <div className="mt-4">
-                                            <Row>                                            
-                                                <Col lg={6} >
+                                            <Row>
+                                                {/* Total Constructed Area */}
+                                                <Col lg={6}>
                                                     <h5 className="fs-14 mb-3">एकूण बांधकामाचे क्षेत्रफळ (चौ.मी)</h5>
                                                     <div className="form-floating mb-3">
-                                                        <Input 
-                                                            type="number" 
-                                                            className="form-control" 
-                                                            id="totalAreaInput" 
-                                                            placeholder="एकूण क्षेत्रफळ (चौ. मी)" 
-                                                            value={totalAreaSqM}
-                                                            onChange={(e) => {
-                                                                const stringValue = String(e.target.value);
-                                                                setTotalAreaSqM(stringValue)}}
+                                                        <Input
+                                                            type="number"
+                                                            className="form-control"
+                                                            id="totalAreaSqMInput"
+                                                            placeholder="एकूण बांधकामाचे क्षेत्रफळ (चौ. मी)"
+                                                            value={otherFacilityFormData.totalAreaSqM}
+                                                            onChange={(e) => handleOtherFacilityChange("totalAreaSqM", e.target.value)}
                                                         />
-                                                        <Label htmlFor="totalAreaInput">
-                                                        एकूण क्षेत्रफळ (चौ. मी)  <span style={{ color: 'red' }}>*</span>
+                                                        <Label htmlFor="totalAreaSqMInput">
+                                                            एकूण बांधकामाचे क्षेत्रफळ (चौ. मी) <span style={{ color: 'red' }}>*</span>
                                                         </Label>
                                                     </div>
                                                 </Col>
-                                           
-                                                <Col lg={6} >
-                                                        <h5 className="fs-14 mb-3">खेळाच्या मैदानाचे क्षेत्रफळ </h5>
-                                                        <div className="form-floating mb-3">
-                                                        <Input 
-                                                            type="number" 
-                                                            className="form-control" 
-                                                            id="totalAreaInput" 
-                                                            placeholder="एकूण क्षेत्रफळ (चौ. मी)" 
-                                                             value={areaSqM}
-                                                            onChange={(e) => {
-                                                          const stringValue = String(e.target.value); 
-                                                          setareaSqM(stringValue)}}
+
+                                                {/* Playground Area */}
+                                                <Col lg={6}>
+                                                    <h5 className="fs-14 mb-3">खेळाच्या मैदानाचे क्षेत्रफळ</h5>
+                                                    <div className="form-floating mb-3">
+                                                        <Input
+                                                            type="number"
+                                                            className="form-control"
+                                                            id="areaSqMInput"
+                                                            placeholder="खेळाच्या मैदानाचे क्षेत्रफळ (चौ. मी)"
+                                                            value={otherFacilityFormData.areaSqM}
+                                                            onChange={(e) => handleOtherFacilityChange("areaSqM", e.target.value)}
                                                         />
-                                                        <Label htmlFor="totalAreaInput">
-                                                        एकूण क्षेत्रफळ (चौ. मी)  <span style={{ color: 'red' }}>*</span>
+                                                        <Label htmlFor="areaSqMInput">
+                                                            खेळाच्या मैदानाचे क्षेत्रफळ (चौ. मी) <span style={{ color: 'red' }}>*</span>
                                                         </Label>
                                                     </div>
                                                 </Col>
-                                                
+
+                                                {/* Total School Premises Area */}
                                                 <Col lg={6}>
                                                     <h5 className="fs-14 mb-3">शाळेच्या परिसराचे एकूण क्षेत्रफळ (चौ. मी.)</h5>
                                                     <div className="form-floating mb-3">
-                                                        <Input 
-                                                            type="number" 
-                                                            className="form-control" 
-                                                            id="totalAreaInput" 
-                                                            placeholder="एकूण क्षेत्रफळ (चौ. मी)" 
-                                                             value={schoolTotalAreaSqM}  
-                                                             onChange={(e) =>{
-                                                             const stringValue = String(e.target.value);
-                                                             setschoolTotalAreaSqM(stringValue)}}
-
-                                                            // }}
+                                                        <Input
+                                                            type="number"
+                                                            className="form-control"
+                                                            id="schoolTotalAreaSqMInput"
+                                                            placeholder="शाळेच्या परिसराचे एकूण क्षेत्रफळ (चौ. मी.)"
+                                                            value={otherFacilityFormData.schoolTotalAreaSqM}
+                                                            onChange={(e) => handleOtherFacilityChange("schoolTotalAreaSqM", e.target.value)}
                                                         />
-                                                        <Label htmlFor="totalAreaInput">
-                                                        एकूण क्षेत्रफळ (चौ. मी)  <span style={{ color: 'red' }}>*</span>
+                                                        <Label htmlFor="schoolTotalAreaSqMInput">
+                                                            शाळेच्या परिसराचे एकूण क्षेत्रफळ (चौ. मी.) <span style={{ color: 'red' }}>*</span>
                                                         </Label>
                                                     </div>
                                                 </Col>
                                             </Row>
+
                                         </div>
                                 </CardBody>
                             </Card>
@@ -626,39 +659,51 @@ const [totalCount, setTotalCount] = useState("");
                                                         <Select
                                                             value={selectedSingle28}
                                                             onChange={(selectedOption) => {
-                                                            setSelectedSingle28(selectedOption);
-                                                            setwesternToiletCount:(selectedOption?.value || "");
+                                                                setSelectedSingle28(selectedOption);  // Ensure this is working
+                                                                setOtherFacilityFormData(prev => ({
+                                                                    ...prev,
+                                                                    westernToiletCount: selectedOption?.value || ""  // Update the form data state here
+                                                                }));
                                                             }}
                                                             options={SingleOptionsT}
                                                             styles={{
                                                                 menuPortal: base => ({ ...base, zIndex: 9999 }),
                                                                 control: base => ({
-                                                                ...base,
-                                                                paddingTop: '9px',
-                                                                paddingBottom: '9px',
+                                                                    ...base,
+                                                                    paddingTop: '9px',
+                                                                    paddingBottom: '9px',
                                                                 }),
                                                             }}
                                                         />
                                                 </div>
                                             </Col>
-                                            <Col lg={6} >
-                                                    <div className="mb-3">
-                                                        <Label htmlFor="choices-single-default" className="form-label">निकषां नुसार सुविधा उपलब्ध आहे का? <span style={{ color: 'red' }}>*</span></Label>
-                                                        <Select
-                                                            value={selectedSingle3}
-                                                            onChange={setSelectedSingle3}
-                                                            options={SingleOptionsT1}
-                                                            styles={{
-                                                                menuPortal: base => ({ ...base, zIndex: 9999 }),
-                                                                control: base => ({
+                                            <Col lg={6}>
+                                                <div className="mb-3">
+                                                    <Label htmlFor="choices-single-default" className="form-label">
+                                                        निकषां नुसार सुविधा उपलब्ध आहे का? <span style={{ color: 'red' }}>*</span>
+                                                    </Label>
+                                                    <Select
+                                                        value={selectedSingle3}
+                                                        onChange={(selectedOption) => {
+                                                            setSelectedSingle3(selectedOption); // Update selected option
+                                                            setOtherFacilityFormData((prev) => ({
+                                                                ...prev,
+                                                                toiletAvailableFacilityDetails: selectedOption?.value || "",  // Update toiletAvailableFacilityDetails based on selection
+                                                            }));
+                                                        }}
+                                                        options={SingleOptionsT1}
+                                                        styles={{
+                                                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                                            control: (base) => ({
                                                                 ...base,
                                                                 paddingTop: '9px',
                                                                 paddingBottom: '9px',
-                                                                }),
-                                                            }}
-                                                        />
-                                                    </div>
+                                                            }),
+                                                        }}
+                                                    />
+                                                </div>
                                             </Col>
+
                                         </Row>
                                     </div>
 
@@ -673,6 +718,8 @@ const [totalCount, setTotalCount] = useState("");
                             </Card>
                         </Col>
                     </Row>
+
+                    {/* remaining backend integration */}
                     <Row>
                         <Col lg={12}>
                             <Card>

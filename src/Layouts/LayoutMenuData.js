@@ -156,9 +156,9 @@ const Navdata = () => {
       
         {
             id: "apps",
-            label: "स्व-मान्यात साठी अर्ज",
+            label: "स्वमान्यता साठी अर्ज",
             icon: "ri-apps-2-line",
-            link: "/#",
+            link: "/सामान्य-माहिती",
             stateVariables: isDashboard,
             click: function (e) {
                 e.preventDefault();
@@ -168,48 +168,48 @@ const Navdata = () => {
             },
           
         },
-        {
-            id: "apps",
-            label: "प्रथम मान्यतेसाठी अर्ज ",
-            icon: "ri-apps-2-line",
-            link: "/#",
-            stateVariables: isDashboard,
-            click: function (e) {
-                e.preventDefault();
-                setIsDashboard(!isDashboard);
-                setIscurrentState('Dashboard');
-                updateIconSidebar(e);
-            },
+        // {
+        //     id: "apps",
+        //     label: "प्रथम मान्यतेसाठी अर्ज ",
+        //     icon: "ri-apps-2-line",
+        //     link: "/#",
+        //     stateVariables: isDashboard,
+        //     click: function (e) {
+        //         e.preventDefault();
+        //         setIsDashboard(!isDashboard);
+        //         setIscurrentState('Dashboard');
+        //         updateIconSidebar(e);
+        //     },
           
-        },
-        {
-            id: "apps",
-            label: "RTE २५% फी प्रतिपूर्ती  अर्ज",
-            icon: "ri-apps-2-line",
-            link: "/#",
-            stateVariables: isDashboard,
-            click: function (e) {
-                e.preventDefault();
-                setIsDashboard(!isDashboard);
-                setIscurrentState('Dashboard');
-                updateIconSidebar(e);
-            },
+        // },
+        // {
+        //     id: "apps",
+        //     label: "RTE २५% फी प्रतिपूर्ती  अर्ज",
+        //     icon: "ri-apps-2-line",
+        //     link: "/#",
+        //     stateVariables: isDashboard,
+        //     click: function (e) {
+        //         e.preventDefault();
+        //         setIsDashboard(!isDashboard);
+        //         setIscurrentState('Dashboard');
+        //         updateIconSidebar(e);
+        //     },
           
-        },
-        {
-            id: "apps",
-            label: "नवीन यु-डायस क्रं साठी अर्ज",
-            icon: "ri-apps-2-line",
-            link: "/#",
-            stateVariables: isDashboard,
-            click: function (e) {
-                e.preventDefault();
-                setIsDashboard(!isDashboard);
-                setIscurrentState('Dashboard');
-                updateIconSidebar(e);
-            },
+        // },
+        // {
+        //     id: "apps",
+        //     label: "नवीन यु-डायस क्रं साठी अर्ज",
+        //     icon: "ri-apps-2-line",
+        //     link: "/#",
+        //     stateVariables: isDashboard,
+        //     click: function (e) {
+        //         e.preventDefault();
+        //         setIsDashboard(!isDashboard);
+        //         setIscurrentState('Dashboard');
+        //         updateIconSidebar(e);
+        //     },
           
-        },
+        // },
       
         {
             id: "tables",
@@ -262,4 +262,4 @@ const Navdata = () => {
     ];
     return <React.Fragment>{menuItems}</React.Fragment>;
 };
-export default Navdata;
+export default Navdata;

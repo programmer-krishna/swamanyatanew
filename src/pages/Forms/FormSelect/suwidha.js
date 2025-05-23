@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import BreadCrumb from '../../../Components/Common/BreadCrumb';
 import { Card, CardBody, Col, Input, Label, Row } from 'reactstrap';
 import PreviewCardHeader from '../../../Components/Common/PreviewCardHeader';
 import UiContent from "../../../Components/Common/UiContent";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import axios from 'axios'; // Import axios
+import { Link, useNavigate ,useLocation } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { FaChevronRight } from 'react-icons/fa';
+
 
 const animatedComponents = makeAnimated();
 
@@ -44,7 +49,13 @@ const FormSelect = () => {
   const [newspapers, setNewspapers] = useState('');
 
   // Set the page title
-  document.title = "इतर सुविधा";
+  //document.title = "इतर सुविधा";
+
+    const navigate = useNavigate();
+  
+      const[successMsg,setSuccessMsg]=useState(null);
+      const[errorMsg,setErrorMsg]=useState(null);
+      const location = useLocation();
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -65,24 +76,109 @@ const FormSelect = () => {
     };
 
     try {
-      // Make a POST request to the backend API
-      const response = await axios.post('http://localhost:8080/api/other-facility/create', formData);
 
-      // Check if the request was successful
-      if (response.status === 200) {
-        alert("Data saved successfully!");
-        // Optionally, redirect or reset the form here
-      } else {
-        alert("There was an error saving the data. Please try again.");
-      }
+      const response = await fetch("http://localhost:8080/api/other-facility/create", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(formData)
+              });
+      
+              if (response.ok) {
+                  const data = await response.json();
+                  if (data.status === "success") {
+                      Swal.fire("यशस्वी", "माहिती जतन झाली आहे!", "success").then(() => {
+                          navigate('/granted-school', { state: { tab: 'grantSchool' } });
+                      });
+                  } else {
+                      setErrorMsg(data.message || "जतन करण्यात अडचण आली!");
+                  }
+              } else {
+                  setErrorMsg("सर्व्हर एरर: " + response.statusText);
+              }
+
+
+
+      // // Make a POST request to the backend API
+      // const response = await axios.post('http://localhost:8080/api/other-facility/create', formData);
+
+      // // Check if the request was successful
+      // if (response.status === 200) {
+      //   alert("Data saved successfully!");
+      //   // Optionally, redirect or reset the form here
+      // } else {
+      //   alert("There was an error saving the data. Please try again.");
+      // }
     } catch (error) {
-      console.error("There was an error submitting the form:", error);
-      alert("An error occurred while submitting the form. Please try again.");
+      console.error("Error while saving data:", error);
+        setErrorMsg("Invalid data");
     }
   };
 
+    document.title = "भौतिक सुविधा";
+  
+      const [activeTab, setActiveTab] = useState(() => {
+        return location.state?.tab || "general";
+      });
+  
+        const breadcrumbTitles = {
+              general: "सामान्य माहिती",
+              students: "विद्यार्थी संख्या",
+              facilities: "भौतिक सुविधा",
+              otherFacilities: "इतर सुविधा",
+              grantSchool: "अनुदानित शाळा",
+              final: "फायनल माहिती"
+            };
+          
+            const tabs = [
+              { id: "general", label: "सामान्य माहिती" },
+              { id: "students", label: "विद्यार्थी संख्या" },
+              { id: "facilities", label: "भौतिक सुविधा" },
+              { id: "otherFacilities", label: "इतर सुविधा" },
+              { id: "grantSchool", label: "अनुदानित शाळा" },
+              { id: "final", label: "फायनल" },
+            ];
+          
+            useEffect(() => {
+              document.title = breadcrumbTitles[activeTab];
+            }, [activeTab]);
+
   return (
     <React.Fragment>
+       {successMsg && (
+                    <div className="alert alert-success mt-3" role="alert">
+                      {successMsg}
+                    </div>
+                  )}
+                  {errorMsg && (
+                    <div className="alert alert-danger mt-3" role="alert">
+                      {errorMsg}
+                    </div>
+                  )}
+                     <div style={{ padding: "94px 24px" }}>
+                       <BreadCrumb
+                        pageTitle={
+                          <>
+                              डॅशबोर्ड <FaChevronRight className="mx-2" /> स्व-मान्यता अर्ज
+                                 <FaChevronRight className="mx-2" /> 
+                                  इतर सुविधा
+                            </>
+                        }
+                      />
+                       
+                  
+                        {/* Tabs under Breadcrumb */}
+                        <div className="tab-nav container-fluid d-flex flex-wrap gap-2 my-3">
+                          {tabs.map((tab) => (
+                            <button
+                              key={tab.id}
+                              onClick={() => setActiveTab(tab.id)}
+                              className={`tab-btn ${activeTab === tab.id ? "active" : ""}`}
+                            >
+                              {tab.label}
+                            </button>
+                          ))}
+                        </div>
+
       <UiContent />
       <div className="container-fluid">
         <Row>
@@ -238,6 +334,7 @@ const FormSelect = () => {
             </Card>
           </Col>
         </Row>
+        </div> 
       </div>
     </React.Fragment>
   );

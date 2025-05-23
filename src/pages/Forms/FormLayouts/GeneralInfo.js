@@ -28,8 +28,8 @@ const GeneralInfo = () => {
 
   const navigate = useNavigate(); // inside component
 
-  const [schoolId, setSchoolId] = useState(1);
-  const [applicationId , setApplicationId] = useState(1);
+  const [schoolId, setSchoolId] = useState(1);   // dynamic value , change according
+  const [applicationId , setApplicationId] = useState(1);   // dynamic value , change according 
 
 const [schoolGenInfo, setSchoolGenInfo] = useState({
   id: "",
@@ -98,7 +98,16 @@ const [schoolGenInfo, setSchoolGenInfo] = useState({
   section3InspectionApproval: "",
   section1InspectionComment: "",
   section2InspectionComment: "",
-  section3InspectionComment: ""
+  section3InspectionComment: "",
+  president_name: "",
+  president_address: "",
+  president_mobile: "",
+  secretary_name: "",
+  secretary_address: "",
+  secretary_mobile: "",
+   headmaster_name: "",
+  headmaster_address: "",
+  headmaster_mobile: "",
 });
 
 // State for the dropdown
@@ -223,7 +232,13 @@ console.log(response);
             const data = await response.json();
             if (data.status === "success") {
             Swal.fire("यशस्वी", "माहिती जतन झाली आहे!", "success").then(() => {
-                navigate('/विद्यार्थी-संख्या', { state: { tab: 'students' } });
+                navigate('/विद्यार्थी-संख्या', {
+                state: {
+                 tab: 'students',
+                 simpleLowerStandard: schoolGenInfo.simpleLowerStandard,
+                 simpleHigherStandard: schoolGenInfo.simpleHigherStandard
+                }
+});
             });
         } else {
             setErrorMsg(data.message || "जतन करण्यात अडचण आली!");
@@ -238,6 +253,22 @@ console.log(response);
     alert("An error occurred while submitting the form. Please try again.");
   }
 };
+//मध्यान भोजन":
+
+const [isOpenLunch, setIsOpenLunch] = useState(false);
+const [startHourLunch, setStartHourLunch] = useState(12);
+const [startMinuteLunch, setStartMinuteLunch] = useState(0);
+const [startAmPmLunch, setStartAmPmLunch] = useState("PM");
+const [endHourLunch, setEndHourLunch] = useState(1);
+const [endMinuteLunch, setEndMinuteLunch] = useState(0);
+const [endAmPmLunch, setEndAmPmLunch] = useState("PM");
+const [timeRangeLunch, setTimeRangeLunch] = useState("");
+
+
+
+
+
+
 
  
  // Update the timeRange text when dropdown values change
@@ -256,29 +287,51 @@ const handleCancelFullTime = () => {
 };
 
 const handleApplyFullTime = () => {
+  const formattedTime = `${startHourFull}:${startMinuteFull.toString().padStart(2, '0')} ${startAmPmFull} - ${endHourFull}:${endMinuteFull.toString().padStart(2, '0')} ${endAmPmFull}`;
+  setTimeRangeFullTime(formattedTime);
+  setSchoolGenInfo(prev => ({
+    ...prev,
+    schoolTimeFullTime: formattedTime
+  }));
   setIsOpenFullTime(false);
 };
-
-const timeRangeFullTime = `${startHourFull}:${startMinuteFull
-  .toString()
-  .padStart(2, "0")} ${startAmPmFull} - ${endHourFull}:${endMinuteFull
-  .toString()
-  .padStart(2, "0")} ${endAmPmFull}`;
+const [timeRangeFullTime, setTimeRangeFullTime] = useState('');
+//const timeRangeFullTime = `${startHourFull}:${startMinuteFull
+  //.toString()
+  //.padStart(2, "0")} ${startAmPmFull} - ${endHourFull}:${endMinuteFull
+  //.toString()
+  //.padStart(2, "0")} ${endAmPmFull}`;
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
   
   const handleApply = () => {
- 
-    setIsOpen(false);
-  };
+   const formatted = `${startHour}:${startMinute.toString().padStart(2, '0')} ${startAmPm} - ${endHour}:${endMinute.toString().padStart(2, '0')} ${endAmPm}`;
+  setTimeRange(formatted); // ✅ This was missing
+  setSchoolGenInfo(prev => ({
+    ...prev,
+    schoolTimeHalfTime: formatted
+  }));
+  setIsOpen(false);
+};
+const handleApplyLunch = () => {
+  const formatted = `${startHourLunch}:${startMinuteLunch.toString().padStart(2, '0')} ${startAmPmLunch} - ${endHourLunch}:${endMinuteLunch.toString().padStart(2, '0')} ${endAmPmLunch}`;
+  setTimeRangeLunch(formatted);
+  setSchoolGenInfo(prev => ({
+    ...prev,
+    lunchTimeForEachClass: formatted
+  }));
+  setIsOpenLunch(false);
+};
   
   const handleCancel = () => {
  
     setIsOpen(false);
   };
-
+const handleCancelLunch = () => {
+  setIsOpenLunch(false);
+};
 
         document.title="";
       
@@ -303,6 +356,9 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
         useEffect(() => {
           document.title = breadcrumbTitles[activeTab];
         }, [activeTab]);
+
+
+        
 
 
     return (
@@ -788,7 +844,7 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                           className="border border-gray-300 rounded p-3 bg-white cursor-pointer"
                                           onClick={toggleDropdown}
                                         >
-                                          {/*timeRange*/} -
+                                          {timeRange || "वेळ निवडा"}
                                         </div>
                                         
                                         {/* Dropdown */}
@@ -895,122 +951,65 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                     </Col>
  
 
-                                    <Col md={6}>
-                                                  <div className="relative w-full max-w-md">
-                                      <div className="mb-1 font-medium">प्रत्येक वर्गासाठी मध्यान भोजनाची वेळ *</div>
-                                      
-                                      {/* Input field */}
-                                      <div 
-                                        className="border border-gray-300 rounded p-3 bg-white cursor-pointer"
-                                        onClick={toggleDropdown}
-                                      >
-                                        {timeRange}
-                                      </div>
-                                      
-                                      {/* Dropdown */}
-                                      {isOpen && (
-                                        <div className="absolute top-full left-0 w-full mt-1 border border-gray-300 rounded bg-white shadow-lg z-10">
-                                          <div className="p-4">
-                                            <div className="flex items-center space-x-2 mb-4">
-                                              {/* Start time */}
-                                              <select 
-                                                className="border border-gray-300 rounded p-1"
-                                                value={startHour}
-                                                onChange={(e) => setStartHour(parseInt(e.target.value))}
-                                              >
-                                                {hours.map(hour => (
-                                                  <option key={`start-hour-${hour}`} value={hour}>{hour}</option>
-                                                ))}
-                                              </select>
-                                              
-                                              <span>:</span>
-                                              
-                                              <select 
-                                                className="border border-gray-300 rounded p-1"
-                                                value={startMinute}
-                                                onChange={(e) => setStartMinute(parseInt(e.target.value))}
-                                              >
-                                                {minutes.map(minute => (
-                                                  <option key={`start-minute-${minute}`} value={minute}>
-                                                    {minute.toString().padStart(2, '0')}
-                                                  </option>
-                                                ))}
-                                              </select>
-                                              
-                                              <select 
-                                                className="border border-gray-300 rounded p-1"
-                                                value={startAmPm}
-                                                onChange={(e) => setStartAmPm(e.target.value)}
-                                              >
-                                                <option value="AM">AM</option>
-                                                <option value="PM">PM</option>
-                                              </select>
-                                              
-                                              {/* Separator */}
-                                              <span>-</span>
-                                              
-                                              {/* End time */}
-                                              <select 
-                                                className="border border-gray-300 rounded p-1"
-                                                value={endHour}
-                                                onChange={(e) => setEndHour(parseInt(e.target.value))}
-                                              >
-                                                {hours.map(hour => (
-                                                  <option key={`end-hour-${hour}`} value={hour}>{hour}</option>
-                                                ))}
-                                              </select>
-                                              
-                                              <span>:</span>
-                                              
-                                              <select 
-                                                className="border border-gray-300 rounded p-1"
-                                                value={endMinute}
-                                                onChange={(e) => setEndMinute(parseInt(e.target.value))}
-                                              >
-                                                {minutes.map(minute => (
-                                                  <option key={`end-minute-${minute}`} value={minute}>
-                                                    {minute.toString().padStart(2, '0')}
-                                                  </option>
-                                                ))}
-                                              </select>
-                                              
-                                              <select 
-                                                className="border border-gray-300 rounded p-1"
-                                                value={endAmPm}
-                                                onChange={(e) => setEndAmPm(e.target.value)}
-                                              >
-                                                <option value="AM">AM</option>
-                                                <option value="PM">PM</option>
-                                              </select>
-                                            </div>
-                                            
-                                            {/* Summary and buttons */}
-                                            <div className="flex justify-between items-center">
-                                              <div className="text-sm">
-                                                {timeRange}
-                                              </div>
-                                              <div className="space-x-2">
-                                                <button 
-                                                  className="px-3 py-1 border border-gray-300 rounded text-black"
-                                                  onClick={handleCancel}
-                                                >
-                                                  Cancel
-                                                </button>
-                                                <button 
-                                                  className="px-3 py-1 bg-blue-500 text-white rounded"
-                                                  onClick={handleApply}
-                                                >
-                                                  Apply
-                                                </button>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                    </Col>
+                                   <Col md={6}>
+  <div className="relative w-full max-w-md">
+    <div className="mb-1 font-medium">प्रत्येक वर्गासाठी मध्यान भोजनाची वेळ *</div>
 
+    {/* Input field */}
+    <div
+      className="border border-gray-300 rounded p-3 bg-white cursor-pointer"
+      onClick={() => setIsOpenLunch(true)}
+    >
+      {timeRangeLunch || "वेळ निवडा"}
+    </div>
 
+    {/* Dropdown */}
+    {isOpenLunch && (
+      <div className="absolute top-full left-0 w-full mt-1 border border-gray-300 rounded bg-white shadow-lg z-10">
+        <div className="p-4">
+          <div className="flex items-center space-x-2 mb-4">
+            {/* Start time */}
+            <select className="border rounded p-1" value={startHourLunch} onChange={e => setStartHourLunch(parseInt(e.target.value))}>
+              {hours.map(h => <option key={`lunch-start-hour-${h}`} value={h}>{h}</option>)}
+            </select>
+            <span>:</span>
+            <select className="border rounded p-1" value={startMinuteLunch} onChange={e => setStartMinuteLunch(parseInt(e.target.value))}>
+              {minutes.map(m => <option key={`lunch-start-minute-${m}`} value={m}>{m.toString().padStart(2, '0')}</option>)}
+            </select>
+            <select className="border rounded p-1" value={startAmPmLunch} onChange={e => setStartAmPmLunch(e.target.value)}>
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+
+            <span>-</span>
+
+            {/* End time */}
+            <select className="border rounded p-1" value={endHourLunch} onChange={e => setEndHourLunch(parseInt(e.target.value))}>
+              {hours.map(h => <option key={`lunch-end-hour-${h}`} value={h}>{h}</option>)}
+            </select>
+            <span>:</span>
+            <select className="border rounded p-1" value={endMinuteLunch} onChange={e => setEndMinuteLunch(parseInt(e.target.value))}>
+              {minutes.map(m => <option key={`lunch-end-minute-${m}`} value={m}>{m.toString().padStart(2, '0')}</option>)}
+            </select>
+            <select className="border rounded p-1" value={endAmPmLunch} onChange={e => setEndAmPmLunch(e.target.value)}>
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
+
+          {/* Summary and buttons */}
+          <div className="flex justify-between items-center">
+            <div className="text-sm">{timeRangeLunch}</div>
+            <div className="space-x-2">
+              <button className="px-3 py-1 border border-gray-300 rounded text-black" onClick={handleCancelLunch}>Cancel</button>
+              <button className="px-3 py-1 bg-blue-500 text-white rounded" onClick={handleApplyLunch}>Apply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+</Col>
                                     <Col md={6}>
                                       <div className="mb-3 mt-3">
                                         <Label htmlFor="nameOfTrustSocietyManagementCommittee" className="form-label">
@@ -1022,6 +1021,12 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                           id="nameOfTrustSocietyManagementCommittee"
                                           name="nameOfTrustSocietyManagementCommittee"
                                           placeholder="ट्रस्टचे नाव लिहा"
+                                          value={schoolGenInfo.nameOfTrustSocietyManagementCommittee}
+                                          onChange={(e) =>
+                                          setSchoolGenInfo((prev) => ({
+                                          ...prev,
+                                         nameOfTrustSocietyManagementCommittee: e.target.value
+                                        }))}
                                         />
                                       </div>
                                     </Col>
@@ -1037,6 +1042,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                           className="form-select"
                                           id="sansthaCompanyHasPurposeForOnlyEducationService"
                                           name="sansthaCompanyHasPurposeForOnlyEducationService"
+                                          value={schoolGenInfo.sansthaCompanyHasPurposeForOnlyEducationService}
+                                          onChange={(e) =>
+                                          setSchoolGenInfo((prev) => ({
+                                          ...prev,
+                                          sansthaCompanyHasPurposeForOnlyEducationService: e.target.value
+                                        }))
+                                        }
                                         >
                                           <option value="" disabled selected>निवडा</option>
                                           <option value="होय">होय</option>
@@ -1056,6 +1068,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                           className="form-select"
                                           id="isSchoolOpenWhereAddressMentionedInApproval"
                                           name="isSchoolOpenWhereAddressMentionedInApproval"
+                                           value={schoolGenInfo.isSchoolOpenWhereAddressMentionedInApproval}
+                                           onChange={(e) =>
+                                           setSchoolGenInfo((prev) => ({
+                                           ...prev,
+                                           isSchoolOpenWhereAddressMentionedInApproval: e.target.value
+                                           }))
+                                          }
                                         >
                                           <option value="" disabled selected>निवडा</option>
                                           <option value="होय">होय</option>
@@ -1075,6 +1094,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                           className="form-select"
                                           id="whetherSchoolIsMovedToAnotherLocation"
                                           name="whetherSchoolIsMovedToAnotherLocation"
+                                          value={schoolGenInfo.whetherSchoolIsMovedToAnotherLocation}
+                                           onChange={(e) =>
+                                             setSchoolGenInfo((prev) => ({
+                                             ...prev,
+                                             whetherSchoolIsMovedToAnotherLocation: e.target.value
+                                            }))
+                                            }
                                         >
                                           <option value="" disabled selected>निवडा</option>
                                           <option value="होय">होय</option>
@@ -1094,6 +1120,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                           className="form-select"
                                           id="ifSansthaIsHandoverToSomeone"
                                           name="ifSansthaIsHandoverToSomeone"
+                                          value={schoolGenInfo.ifSansthaIsHandoverToSomeone}
+                                           onChange={(e) =>
+                                             setSchoolGenInfo((prev) => ({
+                                               ...prev,
+                                                ifSansthaIsHandoverToSomeone: e.target.value
+                                                 }))
+                                                   }
                                         >
                                           <option value="" disabled selected>पर्याय निवडा</option>
                                           <option value="होय">होय</option>
@@ -1117,8 +1150,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                               type="select"
                                               name="doYouHaveMaharastraShashanManyataNo"
                                               id="doYouHaveMaharastraShashanManyataNo"
-                                              value={govApproval}
-                                              onChange={(e) => setGovApproval(e.target.value)}
+                                              value={schoolGenInfo.doYouHaveMaharastraShashanManyataNo}
+                                              onChange={(e) =>
+                                              setSchoolGenInfo((prev) => ({
+                                              ...prev,
+                                              doYouHaveMaharastraShashanManyataNo: e.target.value,
+                                            }))
+                                             }
                                               className="form-select"
                                             >
                                               <option value="" disabled>
@@ -1130,7 +1168,7 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                           </div>
                                         </Col>
 
-                                        {govApproval === "होय" && (
+                                        {schoolGenInfo.doYouHaveMaharastraShashanManyataNo === "होय" && (
                                           <>
                                             <Col lg={3}>
                                               <Label
@@ -1145,8 +1183,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                                 id="maharastraShashanApprovalNumber"
                                                 className="form-control mb-3"
                                                 placeholder="शासन मान्यता आदेश क्र."
-                                                value={manyataNumber}
-                                                onChange={(e) => setManyataNumber(e.target.value)}
+                                                value={schoolGenInfo.maharastraShashanApprovalNumber}
+                                                onChange={(e) =>
+                                                setSchoolGenInfo((prev) => ({
+                                                ...prev,
+                                                maharastraShashanApprovalNumber: e.target.value,
+                                               }))
+                                               }
                                               />
                                             </Col>
                                             <Col lg={3}>
@@ -1162,8 +1205,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                                 id="maharastraShashanApprovalDate"
                                                 className="form-control mb-3"
                                                 placeholder="मान्यता दिनांक"
-                                                value={manyataDate}
-                                                onChange={(e) => setManyataDate(e.target.value)}
+                                                value={schoolGenInfo.maharastraShashanApprovalDate}
+                                               onChange={(e) =>
+                                               setSchoolGenInfo((prev) => ({
+                                               ...prev,
+                                               maharastraShashanApprovalDate: e.target.value,
+                                              }))
+                                              }
                                               />
                                             </Col>
                                           </>
@@ -1185,8 +1233,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                               type="select"
                                               id="doYouHaveShikshanUpsanchalakApproval"
                                               name="doYouHaveShikshanUpsanchalakApproval"
-                                              value={eduApproval}
-                                              onChange={(e) => setEduApproval(e.target.value)}
+                                              value={schoolGenInfo.doYouHaveShikshanUpsanchalakApproval}
+                                              onChange={(e) =>
+                                              setSchoolGenInfo((prev) => ({
+                                             ...prev,
+                                              doYouHaveShikshanUpsanchalakApproval: e.target.value
+                                            }))
+                                            }
                                               className="form-select"
                                             >
                                               <option value="" disabled>
@@ -1198,7 +1251,7 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                           </div>
                                         </Col>
 
-                                        {eduApproval === 'Yes' && (
+                                        {schoolGenInfo.doYouHaveShikshanUpsanchalakApproval === 'Yes' && (
                                           <>
                                             <Col lg={3}>
                                               <Label
@@ -1213,8 +1266,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                                 name="shikshanUpsanchalakApprovalNumber"
                                                 className="form-control mb-3"
                                                 placeholder="उपसंचालक मान्यता आदेश क्र."
-                                                value={upsanchalakNumber}
-                                                onChange={(e) => setUpsanchalakNumber(e.target.value)}
+                                                value={schoolGenInfo.shikshanUpsanchalakApprovalNumber}
+                                                onChange={(e) =>
+                                                setSchoolGenInfo((prev) => ({
+                                                ...prev,
+                                                shikshanUpsanchalakApprovalNumber: e.target.value
+                                              }))
+                                              }
                                               />
                                             </Col>
                                             
@@ -1231,8 +1289,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                                 name="shikshanUpsanchalakApprovalDate"
                                                 className="form-control mb-3"
                                                 placeholder="मान्यता दिनांक"
-                                                value={upsanchalakDate}
-                                                onChange={(e) => setUpsanchalakDate(e.target.value)}
+                                                value={schoolGenInfo.shikshanUpsanchalakApprovalDate}
+                                                 onChange={(e) =>
+                                                 setSchoolGenInfo((prev) => ({
+                                                 ...prev,
+                                                 shikshanUpsanchalakApprovalDate: e.target.value
+                                                 }))
+                                                 }
                                               />
                                             </Col>
                                           </>
@@ -1251,8 +1314,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                               type="select"
                                               id="doYouHavePrathamManyataCertificate"
                                               name="doYouHavePrathamManyataCertificate"
-                                              value={firstApproval}
-                                              onChange={(e) => setFirstApproval(e.target.value)}
+                                              value={schoolGenInfo.doYouHavePrathamManyataCertificate}
+                                              onChange={(e) =>
+                                              setSchoolGenInfo((prev) => ({
+                                              ...prev,
+                                              doYouHavePrathamManyataCertificate: e.target.value
+                                            }))
+                                             }
                                               className="form-select"
                                             >
                                               <option value="" disabled>पर्याय निवडा</option>
@@ -1262,7 +1330,7 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                           </div>
                                         </Col>
 
-                                        {firstApproval === 'Yes' && (
+                                        {schoolGenInfo.doYouHavePrathamManyataCertificate === 'Yes' && (
                                           <>
                                             <Col lg={3}>
                                               <Label htmlFor="prathamManyataNumber" className="form-label">
@@ -1274,8 +1342,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                                 name="prathamManyataNumber"
                                                 className="form-control mb-3"
                                                 placeholder="प्रथम मान्यता आदेश क्र."
-                                                value={prathamNumber}
-                                                onChange={(e) => setPrathamNumber(e.target.value)}
+                                                value={schoolGenInfo.prathamManyataNumber}
+                                                 onChange={(e) =>
+                                                 setSchoolGenInfo((prev) => ({
+                                                 ...prev,
+                                                 prathamManyataNumber: e.target.value
+                                                }))
+                                                }
                                               />
                                             </Col>
                                             <Col lg={3}>
@@ -1288,8 +1361,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                                 name="prathamManyataDate"
                                                 className="form-control mb-3"
                                                 placeholder="प्रथम मान्यता दिनांक"
-                                                value={prathamDate}
-                                                onChange={(e) => setPrathamDate(e.target.value)}
+                                                value={schoolGenInfo.prathamManyataDate}
+                                                 onChange={(e) =>
+                                                 setSchoolGenInfo((prev) => ({
+                                                 ...prev,
+                                                 prathamManyataDate: e.target.value
+                                                }))
+                                                }
                                               />
                                             </Col>
                                           </>
@@ -1307,8 +1385,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                               type="select"
                                               id="doYouRunOnGovernmentNoObjectionCertificate"
                                               name="doYouRunOnGovernmentNoObjectionCertificate"
-                                              value={nocApproval}
-                                              onChange={(e) => setNocApproval(e.target.value)}
+                                              value={schoolGenInfo.doYouRunOnGovernmentNoObjectionCertificate}
+                                               onChange={(e) =>
+                                               setSchoolGenInfo((prev) => ({
+                                               ...prev,
+                                               doYouRunOnGovernmentNoObjectionCertificate: e.target.value
+                                              }))
+                                              }
                                               className="form-select"
                                             >
                                               <option value="" disabled>पर्याय निवडा</option>
@@ -1318,7 +1401,7 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                           </div>
                                         </Col>
 
-                                        {nocApproval === 'Yes' && (
+                                        {schoolGenInfo.doYouRunOnGovernmentNoObjectionCertificate === 'Yes' && (
                                           <>
                                             <Col lg={3}>
                                               <Label htmlFor="noObjectionCertificateNumber" className="form-label">
@@ -1330,8 +1413,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                                 name="noObjectionCertificateNumber"
                                                 className="form-control mb-3"
                                                 placeholder="NOC आदेश क्र."
-                                                value={nocNumber}
-                                                onChange={(e) => setNocNumber(e.target.value)}
+                                                value={schoolGenInfo.noObjectionCertificateNumber}
+                                                 onChange={(e) =>
+                                                 setSchoolGenInfo((prev) => ({
+                                                 ...prev,
+                                                 noObjectionCertificateNumber: e.target.value
+                                                 }))
+                                                 }
                                               />
                                             </Col>
                                             <Col lg={3}>
@@ -1344,8 +1432,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                                 name="noObjectionCertificateDate"
                                                 className="form-control mb-3"
                                                 placeholder="NOC दिनांक"
-                                                value={nocDate}
-                                                onChange={(e) => setNocDate(e.target.value)}
+                                                value={schoolGenInfo.noObjectionCertificateDate}
+                                                onChange={(e) =>
+                                                setSchoolGenInfo((prev) => ({
+                                                ...prev,
+                                               noObjectionCertificateDate: e.target.value
+                                              }))
+                                              }
                                               />
                                             </Col>
                                           </>
@@ -1364,8 +1457,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                             type="select"
                                             id="isThereAnAffiliationCertificate"
                                             name="isThereAnAffiliationCertificate"
-                                            value={affiliationApproval}
-                                            onChange={(e) => setAffiliationApproval(e.target.value)}
+                                            value={schoolGenInfo.isThereAnAffiliationCertificate}
+                                             onChange={(e) =>
+                                             setSchoolGenInfo((prev) => ({
+                                             ...prev,
+                                             isThereAnAffiliationCertificate: e.target.value
+                                             }))
+                                             }
                                             className="form-select"
                                           >
                                             <option value="" disabled>पर्याय निवडा</option>
@@ -1375,7 +1473,7 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                         </div>
                                       </Col>
 
-                                      {affiliationApproval === 'Yes' && (
+                                      {schoolGenInfo.isThereAnAffiliationCertificate === 'Yes' && (
                                         <>
                                           <Col lg={3}>
                                             <Label htmlFor="affiliationCertificateNumber" className="form-label">
@@ -1387,8 +1485,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                               name="affiliationCertificateNumber"
                                               className="form-control mb-3"
                                               placeholder="संलग्नता प्रमाणपत्र क्र."
-                                              value={affiliationNumber}
-                                              onChange={(e) => setAffiliationNumber(e.target.value)}
+                                              value={schoolGenInfo.affiliationCertificateNumber}
+                                               onChange={(e) =>
+                                               setSchoolGenInfo((prev) => ({
+                                               ...prev,
+                                                affiliationCertificateNumber: e.target.value
+                                               }))
+                                              }
                                             />
                                           </Col>
                                           <Col lg={3}>
@@ -1401,8 +1504,13 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
                                               name="affiliationCertificateDate"
                                               className="form-control mb-3"
                                               placeholder="संलग्नता दिनांक"
-                                              value={affiliationDate}
-                                              onChange={(e) => setAffiliationDate(e.target.value)}
+                                              value={schoolGenInfo.affiliationCertificateDate}
+                                               onChange={(e) =>
+                                               setSchoolGenInfo((prev) => ({
+                                               ...prev,
+                                               affiliationCertificateDate: e.target.value
+                                              }))
+                                              }
                                             />
                                           </Col>
                                         </>
@@ -1426,15 +1534,30 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
         <Row className="mb-3">
           <Col lg={4}>
             <Label className="form-label">अध्यक्षाचे नाव</Label>
-            <Input type="text" className="form-control" name="president_name" />
+            <Input type="text" className="form-control" name="president_name"  placeholder="अध्यक्षाचे नाव"  value={schoolGenInfo.president_name}  onChange={(e) =>
+              setSchoolGenInfo((prev) => ({
+              ...prev,
+                president_name: e.target.value
+               }))
+               }/>
           </Col>
           <Col lg={4}>
             <Label className="form-label">पत्ता</Label>
-            <Input type="text" className="form-control" name="president_address" />
+            <Input type="text" className="form-control" name="president_address" placeholder="पत्ता"   value={schoolGenInfo.president_address} onChange={(e) =>
+                 setSchoolGenInfo((prev) => ({
+                ...prev,
+                 president_address: e.target.value
+                 }))
+                 }/>
           </Col>
           <Col lg={4}>
             <Label className="form-label">मोबाईल क्रमांक (कार्यालय निवास)</Label>
-            <Input type="text" className="form-control" name="president_mobile" />
+            <Input type="text" className="form-control" name="president_mobile"   placeholder="मोबाईल क्रमांक"  value={schoolGenInfo.president_mobile}  onChange={(e) =>
+             setSchoolGenInfo((prev) => ({
+              ...prev,
+              president_mobile: e.target.value
+             }))
+             }/>
           </Col>
         </Row>
 
@@ -1442,15 +1565,35 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
         <Row className="mb-3">
           <Col lg={4}>
             <Label className="form-label">सचिवाचे नाव</Label>
-            <Input type="text" className="form-control" name="secretary_name" />
+            <Input type="text" className="form-control" name="secretary_name" placeholder="सचिवाचे नाव"  value={schoolGenInfo.secretary_name}  onChange={(e) =>
+             setSchoolGenInfo((prev) => ({
+              ...prev,
+              secretary_name: e.target.value
+               }))
+               } />
+
+
           </Col>
           <Col lg={4}>
             <Label className="form-label">पत्ता</Label>
-            <Input type="text" className="form-control" name="secretary_address" />
+            <Input type="text" className="form-control" name="secretary_address"  placeholder="पत्ता" value={schoolGenInfo.secretary_address}   onChange={(e) =>
+             setSchoolGenInfo((prev) => ({
+             ...prev,
+               secretary_address: e.target.value
+              }))
+              }/>
+
+
           </Col>
           <Col lg={4}>
             <Label className="form-label">मोबाईल क्रमांक (कार्यालय निवास)</Label>
-            <Input type="text" className="form-control" name="secretary_mobile" />
+            <Input type="text" className="form-control" name="secretary_mobile"  placeholder="मोबाईल क्रमांक"  value={schoolGenInfo.secretary_mobile}  onChange={(e) =>
+             setSchoolGenInfo((prev) => ({
+             ...prev,
+             secretary_mobile: e.target.value
+             }))
+             }/>
+
           </Col>
         </Row>
 
@@ -1458,15 +1601,36 @@ const timeRangeFullTime = `${startHourFull}:${startMinuteFull
         <Row className="mb-3">
           <Col lg={4}>
             <Label className="form-label">मुख्याध्यापकाचे नाव</Label>
-            <Input type="text" className="form-control" name="headmaster_name" />
+            <Input type="text" className="form-control" name="headmaster_name"  placeholder="मुख्याध्यापकाचे नाव"  value={schoolGenInfo.headmaster_name} onChange={(e) =>
+               setSchoolGenInfo((prev) => ({
+               ...prev,
+               headmaster_name: e.target.value
+                }))
+               } />
+
+
           </Col>
           <Col lg={4}>
             <Label className="form-label">पत्ता</Label>
-            <Input type="text" className="form-control" name="headmaster_address" />
+            <Input type="text" className="form-control" name="headmaster_address"  placeholder="पत्ता"  value={schoolGenInfo.headmaster_address}  onChange={(e) =>
+                setSchoolGenInfo((prev) => ({
+               ...prev,
+               headmaster_address: e.target.value
+               }))
+               }/>
+
+
+
           </Col>
           <Col lg={4}>
             <Label className="form-label">मोबाईल क्रमांक (कार्यालय निवास)</Label>
-            <Input type="text" className="form-control" name="headmaster_mobile" />
+            <Input type="text" className="form-control" name="headmaster_mobile"  placeholder="मोबाईल क्रमांक" value={schoolGenInfo.headmaster_mobile}   onChange={(e) =>
+               setSchoolGenInfo((prev) => ({
+               ...prev,
+               headmaster_mobile: e.target.value
+              }))
+             }/>
+
           </Col>
         </Row>
 

@@ -16,15 +16,15 @@ import { useNavigate } from 'react-router-dom';
 
 const VidhyarthiSankhya = () => {
     const navigate = useNavigate();
-
-    const [lowestClass, setLowestClass] = useState("");
-    const [highestClass, setHighestClass] = useState("");
+    const location = useLocation();
+    const [lowestClass, setLowestClass] = useState(location.state?.simpleLowerStandard || ""); 
+    const [highestClass, setHighestClass] = useState(location.state?.simpleHigherStandard || "")
     const [classList, setClassList] = useState([]);
     const [studentData, setStudentData] = useState({});
 
 const[successMsg,setSuccessMsg]=useState(null);
 const[errorMsg,setErrorMsg]=useState(null);
-const location = useLocation();
+
 
 const [activeTab, setActiveTab] = useState(() => {
   return location.state?.tab || "general";

@@ -12,7 +12,7 @@ const Footer = () => {
                         </Col>
                         <Col sm={6}>
                             <div className="text-sm-end d-none d-sm-block">
-                                Design & Develop by Cybermate Tech Pvt Ltd.
+                                Design & Develop by Cybermate Software Technologies Pvt Ltd.
                             </div>
                         </Col>
                     </Row>
@@ -22,4 +22,4 @@ const Footer = () => {
     );
 };
 
-export default Footer;
+export default Footer;
